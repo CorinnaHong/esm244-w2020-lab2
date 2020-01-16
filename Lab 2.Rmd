@@ -1,0 +1,40 @@
+---
+title: "Lab 2"
+author: "Corinna Hong"
+date: "January 16, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, load packages, echo = FALSE, message = FALSE, warning = FALSE}
+
+library(tidyverse)
+library(janitor)
+library(naniar)
+library(VIM)
+library(skimr)
+library(ggfortify)
+library(here)
+
+```
+
+1. Get some data
+```{r, read in data, message = FALSE}
+
+ca_pb <- read_csv(here("data","ca_pollution_burden.csv"))
+ca_dem <- read_csv(here("data","ca_census_demographics_2010.csv"))
+
+```
+
+2. Clean and wrangle data
+
+```{r}
+
+ca_pb_nopct <- ca_pb %>% 
+  clean_names()
+
+```
+

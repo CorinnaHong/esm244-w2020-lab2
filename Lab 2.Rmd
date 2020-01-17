@@ -21,7 +21,8 @@ library(here)
 
 ```
 
-1. Get some data
+
+#1. Get some data
 ```{r, read in data, message = FALSE}
 
 ca_pb <- read_csv(here("data","ca_pollution_burden.csv"))
@@ -29,12 +30,79 @@ ca_dem <- read_csv(here("data","ca_census_demographics_2010.csv"))
 
 ```
 
-2. Clean and wrangle data
 
-```{r}
+#2. Clean and wrangle data
+```{r, message = FALSE}
 
 ca_pb_nopct <- ca_pb %>% 
+  clean_names() %>%
+  select(-contains("perc")) %>% # - means remove contains() means anything that contains what is in quotes
+  select(-contains("pctl")) %>% 
+  select(-latitude, - longitude) # no quotes are for column names
+
+
+ca_dem_clean <- ca_dem %>% 
   clean_names()
+
+```
+
+
+#3. Pollution burden indicators only
+```{r, message = FALSE}
+
+ca_pb_subest <- ca_pb_nopct %>% 
+  select(ozone:solid_waste,asthma:housing_burden)
+
+```
+
+Doing PCA
+```{r, eval = FALSE}
+
+# eval = FALSE up top lets us keep failed code for our record w/o running into problems with knitting
+
+pb_pca <- prcomp(ca_pb_subest, scale = TRUE) # This gives an error because there are missings!
+
+```
+
+*Aside: Explore missingness*
+```{r}
+
+summary(ca_pb_subest) # can tell you how many NA's there are in the data . In our case, relatively low proportion. Removing them would be ok
+gg_miss_var(ca_pb_subest) # graph to show you how many NA's for each variable 
+matrixplot(ca_pb_subest) # Red areas are missing data and can also help visualize correlation
+
+```
+
+Remove (complete case deletion) any observation with ANY NA values:
+```{r}
+
+ca_pb_nona <- ca_pb_subest %>% 
+  drop_na()
+
+skim(ca_pb_nona) # summarazies in a nicer way than summary()
+
+```
+
+Doing PCA II
+```{r, message = FALSE}
+
+my_ca_pca <- prcomp(ca_pb_nona, scale = TRUE)
+
+my_ca_pca # Gives loading for every PC
+summary(my_ca_pca) # Proportion of variance explained by each PC
+
+# biplot(my_ca_pca) that was very messy
+
+# Actually, let's use autoplot
+
+my_biplot <- autoplot(my_ca_pca,
+                      colour = NA,
+                      loadings.label = TRUE,
+                      loadings.label.size = 3,
+                      loadings.label.colour = "black",
+                      loadings.label.repel = TRUE) # forces labels to "repel" each other a little
+
+my_biplot
 
 ```
 

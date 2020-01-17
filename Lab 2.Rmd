@@ -22,7 +22,7 @@ library(here)
 ```
 
 
-#1. Get some data
+##1. Get some data
 ```{r, read in data, message = FALSE}
 
 ca_pb <- read_csv(here("data","ca_pollution_burden.csv"))
@@ -31,7 +31,7 @@ ca_dem <- read_csv(here("data","ca_census_demographics_2010.csv"))
 ```
 
 
-#2. Clean and wrangle data
+##2. Clean and wrangle data
 ```{r, message = FALSE}
 
 ca_pb_nopct <- ca_pb %>% 
@@ -47,7 +47,7 @@ ca_dem_clean <- ca_dem %>%
 ```
 
 
-#3. Pollution burden indicators only
+##3. Pollution burden indicators only
 ```{r, message = FALSE}
 
 ca_pb_subest <- ca_pb_nopct %>% 
@@ -67,19 +67,19 @@ pb_pca <- prcomp(ca_pb_subest, scale = TRUE) # This gives an error because there
 *Aside: Explore missingness*
 ```{r}
 
-summary(ca_pb_subest) # can tell you how many NA's there are in the data . In our case, relatively low proportion. Removing them would be ok
+# summary(ca_pb_subest) can tell you how many NA's there are in the data . In our case, relatively low proportion. Removing them would be ok
 gg_miss_var(ca_pb_subest) # graph to show you how many NA's for each variable 
 matrixplot(ca_pb_subest) # Red areas are missing data and can also help visualize correlation
 
 ```
 
 Remove (complete case deletion) any observation with ANY NA values:
-```{r}
+```{r, results = FALSE}
 
 ca_pb_nona <- ca_pb_subest %>% 
   drop_na()
 
-skim(ca_pb_nona) # summarazies in a nicer way than summary()
+skim(ca_pb_nona) # summarizes in a nicer way than summary()
 
 ```
 
@@ -100,9 +100,61 @@ my_biplot <- autoplot(my_ca_pca,
                       loadings.label = TRUE,
                       loadings.label.size = 3,
                       loadings.label.colour = "black",
-                      loadings.label.repel = TRUE) # forces labels to "repel" each other a little
+                      loadings.label.repel = TRUE) + # forces labels to "repel" each other a little
+  theme_minimal()
 
 my_biplot
+
+```
+
+
+##4. PCA for pollution burden + demographics
+
+join together the ca_dem_clean with ca_pb_nopct
+```{r}
+
+ca_df <- ca_dem_clean %>%
+  inner_join(ca_pb_nopct, by = c("census_tract_number" = "census_tract"))
+
+# Now drop NAs by complete case deletion
+
+ca_nona <- ca_df %>%
+  drop_na()
+
+```
+
+make a subset of ca_nona that only includes:
+-white percent
+-elderly_65_percent
+-pm2_5
+-pesticides
+-traffic
+-asthma
+-cardiovascular_disease
+-poverty
+
+```{r}
+
+ca_subset <- ca_nona %>%
+  select(white_percent, elderly_65_percent, pm2_5, pesticides, traffic, asthma, cardiovascular_disease, poverty)
+
+```
+
+PCA
+```{r, message = FALSE}
+
+my_dem_pca <- prcomp(ca_subset, scale = TRUE)
+
+my_dem_biplot <- autoplot(my_dem_pca,
+                      colour = NA,
+                      loadings.label = TRUE,
+                      loadings.label.size = 3,
+                      loadings.label.colour = "black",
+                      loadings.label.repel = TRUE) + # forces labels to "repel" each other a little
+  scale_y_continuous(limits = c(-0.05,0.05)) +
+  theme_minimal()
+
+my_dem_biplot
 
 ```
 

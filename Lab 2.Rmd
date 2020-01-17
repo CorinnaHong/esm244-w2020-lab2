@@ -84,7 +84,7 @@ skim(ca_pb_nona) # summarizes in a nicer way than summary()
 ```
 
 Doing PCA II
-```{r, message = FALSE}
+```{r, warning = FALSE}
 
 my_ca_pca <- prcomp(ca_pb_nona, scale = TRUE)
 
@@ -123,15 +123,15 @@ ca_nona <- ca_df %>%
 
 ```
 
-make a subset of ca_nona that only includes:
--white percent
--elderly_65_percent
--pm2_5
--pesticides
--traffic
--asthma
--cardiovascular_disease
--poverty
+make a subset of ca_nona that only includes:\
+-white percent\
+-elderly_65_percent\
+-pm2_5\
+-pesticides\
+-traffic\
+-asthma\
+-cardiovascular_disease\
+-poverty\
 
 ```{r}
 
@@ -141,7 +141,7 @@ ca_subset <- ca_nona %>%
 ```
 
 PCA
-```{r, message = FALSE}
+```{r, warning = FALSE}
 
 my_dem_pca <- prcomp(ca_subset, scale = TRUE)
 

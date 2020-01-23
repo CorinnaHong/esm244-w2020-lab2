@@ -36,7 +36,7 @@ ca_dem <- read_csv(here("data","ca_census_demographics_2010.csv"))
 
 ca_pb_nopct <- ca_pb %>% 
   clean_names() %>%
-  select(-contains("perc")) %>% # - means remove contains() means anything that contains what is in quotes
+  select(-contains("perc")) %>% # - means remove, contains() means anything that contains what is in quotes
   select(-contains("pctl")) %>% 
   select(-latitude, - longitude) # no quotes are for column names
 

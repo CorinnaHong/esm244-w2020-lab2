@@ -41,4 +41,3 @@ server <- function(input, output) {
 }
 
 shinyApp(ui = ui, server = server) # tells shiny app the name of your ui and server, in case you named it something different ui = name
-
